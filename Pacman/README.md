@@ -10,3 +10,5 @@ ghosts invisible.
 
 A comprehensive testing suite quantified by high Jacoco coverage and Javadoc is accessible.
 Object oriented programming (OOP) principles have been applied, and can be observed in the UML
+
+![Pacman UML](https://github.com/Hyperplane16/Projects/assets/44485286/a50041f6-7df3-4162-945c-ea1100415165)
