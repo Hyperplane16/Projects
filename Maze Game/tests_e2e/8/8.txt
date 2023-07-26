@@ -1,0 +1,1 @@
+Stepping back onto home pad and trying to leave the perimeter there should act as stepping into a wall.

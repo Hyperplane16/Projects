@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Waka.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Waka</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">Waka.java</span></div><h1>Waka.java</h1><pre class="source lang-java linenums">package game;
+
+import processing.core.PImage;
+import java.util.*;
+
+/**
+* Waka class which manages all aspects of Waka's functionality.
+*/
+public class Waka extends GameObject implements Character {
+    /**
+    * The current velocity in the x direction.
+    */
+    public int xVelocity;
+    /**
+    * The current velocity in the y direction.
+    */
+    public int yVelocity;
+    /**
+    * The PImage sprite of the right facing Waka.
+    */
+    public PImage playerRight;
+    /**
+    * The PImage sprite of the left facing Waka.
+    */
+    public PImage playerLeft;
+    /**
+    * The PImage sprite of the up facing Waka.
+    */
+    public PImage playerUp;
+    /**
+    * The PImage sprite of the down facing Waka.
+    */
+    public PImage playerDown;
+    /**
+    * The PImage sprite of the closed Waka.
+    */
+    public PImage playerClosed;
+    /**
+    * Whether Waka's mouth is currently closed.
+    */
+    public boolean mouthClosed;
+    /**
+    * The current direction that the mouth is pointing at.
+    * &lt;br&gt;
+    * (left, right, up, down)
+    */
+    public String mouthDirection; // Direction of Waka for mouth animation
+
+    /**
+    * Initialises variables of the Waka object.
+    * @param x The x coordinate
+    * @param y The y coordinate
+    */
+    public Waka(int x, int y) {
+<span class="fc" id="L55">        super(x, y, null);</span>
+
+<span class="fc" id="L57">        this.xVelocity = 0;</span>
+<span class="fc" id="L58">        this.yVelocity = 0;</span>
+
+<span class="fc" id="L60">        this.mouthClosed = true;</span>
+<span class="fc" id="L61">        this.mouthDirection = &quot;left&quot;;</span>
+<span class="fc" id="L62">    }</span>
+
+    public void tick(App app, Game game) {
+<span class="fc" id="L65">        this.x += this.xVelocity;</span>
+<span class="fc" id="L66">        this.y += this.yVelocity;</span>
+        
+        // Saves the current direction of Waka's movement for animation
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (this.xVelocity &lt; 0) {</span>
+<span class="fc" id="L70">            this.mouthDirection = &quot;left&quot;;</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        } else if (this.xVelocity &gt; 0) {</span>
+<span class="fc" id="L72">            this.mouthDirection = &quot;right&quot;;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        } else if (this.yVelocity &lt; 0) {</span>
+<span class="fc" id="L74">            this.mouthDirection = &quot;up&quot;;</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        } else if (this.yVelocity &gt; 0) {</span>
+<span class="fc" id="L76">            this.mouthDirection = &quot;down&quot;;</span>
+        }
+
+<span class="fc" id="L79">        this.conductReverseDirection(game); // Allows Waka to turn around</span>
+<span class="fc" id="L80">        this.conductQueuedMovement(game); // Movement method for Waka</span>
+<span class="fc" id="L81">        this.checkWallCollision(game); // Method for bouncing off walls</span>
+<span class="fc" id="L82">        this.checkFruitCollision(app, game); // Method to check consumable collision</span>
+<span class="fc" id="L83">        this.checkGhostCollision(game); // Check ghost collision</span>
+<span class="fc" id="L84">    }</span>
+
+    public void draw(App app, Game game) {
+<span class="fc" id="L87">        app.image(this.sprite, this.x, this.y);</span>
+<span class="fc" id="L88">    }</span>
+
+    public void setSpeed(int xVelocity, int yVelocity) {
+<span class="fc" id="L91">        this.xVelocity = xVelocity;</span>
+<span class="fc" id="L92">        this.yVelocity = yVelocity;</span>
+<span class="fc" id="L93">    }</span>
+
+    // Change Waka's sprite in the direction of movement (to permit mouth animation)
+    public void changeSprite() {
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        if (this.mouthClosed == true) {</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">            if (this.mouthDirection == &quot;left&quot;) {</span>
+<span class="fc" id="L99">                this.sprite = this.playerLeft;</span>
+<span class="fc" id="L100">                this.mouthClosed = false;</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            } else if (this.mouthDirection ==  &quot;right&quot;) {</span>
+<span class="fc" id="L102">                this.sprite = this.playerRight;</span>
+<span class="fc" id="L103">                this.mouthClosed = false;</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            } else if (this.mouthDirection == &quot;up&quot;) {</span>
+<span class="fc" id="L105">                this.sprite = this.playerUp;</span>
+<span class="fc" id="L106">                this.mouthClosed = false;</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">            } else if (this.mouthDirection == &quot;down&quot;) {</span>
+<span class="fc" id="L108">                this.sprite = this.playerDown;</span>
+<span class="fc" id="L109">                this.mouthClosed = false;</span>
+            }
+        } else {
+<span class="fc" id="L112">            this.sprite = this.playerClosed;</span>
+<span class="fc" id="L113">            this.mouthClosed = true;</span>
+        }
+<span class="fc" id="L115">    }</span>
+
+    // Reset Waka's characteristics (once he collides with a ghost)
+    public void reset() {
+<span class="fc" id="L119">        this.x = this.xSpawn;</span>
+<span class="fc" id="L120">        this.y = this.ySpawn;</span>
+<span class="fc" id="L121">        this.xVelocity = 0;</span>
+<span class="fc" id="L122">        this.yVelocity = 0;</span>
+<span class="fc" id="L123">        this.sprite = this.playerLeft;</span>
+<span class="fc" id="L124">    }</span>
+    
+    // ____________________________________________________________________________________________
+
+    // Allows for Waka to turn in the opposite direction instantly
+    /**
+    * Allows Waka to instantly turn in the opposite direction if the opposite keyboard keypress
+    * is made.
+    * @param game The Game object
+    */
+    public void conductReverseDirection(Game game) {
+        // If Waka's direction is currently opposite to the keypress,
+        // reset waka's speed to the new keypress direction
+<span class="fc bfc" id="L137" title="All 4 branches covered.">        if (game.moveKey == 37 &amp;&amp; this.xVelocity &gt; 0) { // LEFT</span>
+<span class="fc" id="L138">            this.setSpeed(-game.speed, 0);</span>
+<span class="fc bfc" id="L139" title="All 4 branches covered.">        } else if (game.moveKey == 39 &amp;&amp; this.xVelocity &lt; 0) { // RIGHT</span>
+<span class="fc" id="L140">            this.setSpeed(game.speed, 0);</span>
+<span class="fc bfc" id="L141" title="All 4 branches covered.">        } else if (game.moveKey == 38 &amp;&amp; this.yVelocity &gt; 0) { // UP</span>
+<span class="fc" id="L142">            this.setSpeed(0, -game.speed);</span>
+<span class="fc bfc" id="L143" title="All 4 branches covered.">        } else if (game.moveKey == 40 &amp;&amp; this.yVelocity &lt; 0) { // DOWN</span>
+<span class="fc" id="L144">            this.setSpeed(0, game.speed);</span>
+        }
+<span class="fc" id="L146">    }</span>
+
+    /**
+    * A method for queued movement, allowing Waka to turn in the direction of a keypress only
+    * if Waka is in the centre of the current cell and there is no wall blocking the path.
+    * &lt;br&gt;
+    * This allows Waka to turn at the next possible opportunity.
+    * @param game The Game object
+    */
+    public void conductQueuedMovement(Game game) {
+        // Consider movement direction only at the middle of a cell
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        if (this.isCentre(game.WAKAOFFSET) == false) {</span>
+<span class="fc" id="L158">            return;</span>
+        }
+
+        // Iterate through the list of walls to attempt to find a wall cell in the direction of
+        // keypress (desired movement). If not found, then Waka can turn in that direction
+<span class="fc" id="L163">        int counter = 0;</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        for (Wall wall : game.wallList) {</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">            if (game.moveKey == 37) { // MOVEMENT LEFT</span>
+                // Consider the cell to to he left of the current
+<span class="pc bpc" id="L167" title="1 of 4 branches missed.">                if (wall.x == this.getCx(game.WAKAOFFSET) - game.GRIDSPACE &amp;&amp; wall.y == this.getCy(game.WAKAOFFSET)) {</span>
+<span class="fc" id="L168">                    return;</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">                } else if (counter == game.wallList.size()-1) {</span>
+                    // If no wall is found in the direction of keypress, turn
+<span class="fc" id="L171">                    this.setSpeed(-game.speed, 0);</span>
+                }
+<span class="fc bfc" id="L173" title="All 2 branches covered.">            } else if (game.moveKey == 38) { // MOVEMENT UP</span>
+                // Consider the cell to the top of the current
+<span class="pc bpc" id="L175" title="1 of 4 branches missed.">                if (wall.x == this.getCx(game.WAKAOFFSET) &amp;&amp; wall.y == this.getCy(game.WAKAOFFSET) - 16) {</span>
+<span class="fc" id="L176">                    return;</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">                } else if (counter == game.wallList.size()-1) {</span>
+                     // If no wall is found in the direction of keypress, turn
+<span class="fc" id="L179">                    this.setSpeed(0, -game.speed);</span>
+                }
+<span class="fc bfc" id="L181" title="All 2 branches covered.">            } else if (game.moveKey == 39) { // MOVEMENT RIGHT</span>
+                // Consider the cell to the left of the current
+<span class="pc bpc" id="L183" title="1 of 4 branches missed.">                if (wall.x == this.getCx(game.WAKAOFFSET) + 16 &amp;&amp; wall.y == this.getCy(game.WAKAOFFSET)) {</span>
+<span class="fc" id="L184">                    return;                          </span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">                } else if (counter == game.wallList.size()-1) {</span>
+                    // If no wall is found in the direction of keypress, turn
+<span class="fc" id="L187">                    this.setSpeed(game.speed, 0);</span>
+                }
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">            } else if (game.moveKey == 40) { // MOVEMENT DOWN</span>
+                // Consider the cell to the top of the current
+<span class="pc bpc" id="L191" title="1 of 4 branches missed.">                if (wall.x == this.getCx(game.WAKAOFFSET) &amp;&amp; wall.y == this.getCy(game.WAKAOFFSET) + 16) {</span>
+<span class="fc" id="L192">                    return;  </span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">                } else if (counter == game.wallList.size()-1) {</span>
+                    // If no wall is found in the direction of keypress, turn
+<span class="fc" id="L195">                    this.setSpeed(0, game.speed);</span>
+                }
+            }
+<span class="fc" id="L198">            counter += 1;</span>
+<span class="fc" id="L199">        }</span>
+<span class="fc" id="L200">    }</span>
+
+    /**
+    * Halt Waka's movement if he runs into a wall in the direction of movement.
+    * @param game The Game object
+    */
+    public void checkWallCollision(Game game) {
+        // Consider movement direction only at the middle of a cell
+<span class="fc bfc" id="L208" title="All 2 branches covered.">        if (this.isCentre(game.WAKAOFFSET) == false) {</span>
+<span class="fc" id="L209">            return;</span>
+        }
+
+<span class="fc bfc" id="L212" title="All 2 branches covered.">        for (Wall wall : game.wallList) {</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">            if (this.xVelocity &lt; 0) { // MOVEMENT LEFT</span>
+                // Consider the cell to the left of the current
+<span class="pc bpc" id="L215" title="1 of 4 branches missed.">                if (wall.x == this.getCx(game.WAKAOFFSET) - game.GRIDSPACE &amp;&amp; wall.y == this.getCy(game.WAKAOFFSET)) {</span>
+<span class="fc" id="L216">                    this.setSpeed(0, 0); </span>
+<span class="fc" id="L217">                    return;</span>
+                }
+<span class="fc bfc" id="L219" title="All 2 branches covered.">            } else if (this.xVelocity &gt; 0) { // MOVEMENT RIGHT</span>
+                // Consider the cell to the right of the current
+<span class="pc bpc" id="L221" title="1 of 4 branches missed.">                if (wall.x == this.getCx(game.WAKAOFFSET) + game.GRIDSPACE &amp;&amp; wall.y == this.getCy(game.WAKAOFFSET)) {</span>
+<span class="fc" id="L222">                    this.setSpeed(0, 0);</span>
+<span class="fc" id="L223">                    return;</span>
+                }
+<span class="fc bfc" id="L225" title="All 2 branches covered.">            } else if (this.yVelocity &lt; 0) { // MOVEMENT UP</span>
+                // Consider the cell above the current
+<span class="pc bpc" id="L227" title="1 of 4 branches missed.">                if (wall.x == this.getCx(game.WAKAOFFSET) &amp;&amp; wall.y == this.getCy(game.WAKAOFFSET) - game.GRIDSPACE) {</span>
+<span class="fc" id="L228">                    this.setSpeed(0, 0);</span>
+<span class="fc" id="L229">                    return;</span>
+                }
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">            } else if (this.yVelocity &gt; 0) { // MOVEMENT DOWN</span>
+                // Consider the cell above the current
+<span class="pc bpc" id="L233" title="1 of 4 branches missed.">                if (wall.x == this.getCx(game.WAKAOFFSET) &amp;&amp; wall.y == this.getCy(game.WAKAOFFSET) + game.GRIDSPACE) {</span>
+<span class="fc" id="L234">                    this.setSpeed(0, 0);</span>
+<span class="fc" id="L235">                    return;</span>
+                }
+            }
+<span class="fc" id="L238">        }</span>
+<span class="fc" id="L239">    }</span>
+
+    /**
+    * Detect if Waka is colliding with a consumable object. If so, activate their individual collide methods.
+    * @param app The App object
+    * @param game The Game object
+    */
+    public void checkFruitCollision(App app, Game game) {
+<span class="fc bfc" id="L247" title="All 2 branches covered.">        for (int i = 0; i &lt; game.consumableList.size(); i++) {</span>
+<span class="fc" id="L248">            Consumable cell = game.consumableList.get(i);     </span>
+<span class="fc" id="L249">            int hitBoxOffset = 0;</span>
+<span class="fc" id="L250">            hitBoxOffset = cell.offset; // Retreive drawing offset value</span>
+            // x-coordinates or y-coordinates overlap
+<span class="fc bfc" id="L252" title="All 8 branches covered.">            if ((cell.x + 8 + hitBoxOffset &gt;= this.x + hitBoxOffset &amp;&amp; cell.x &lt;= this.x + 8) &amp;&amp; </span>
+                (cell.y + 8 + hitBoxOffset &gt;= this.y + hitBoxOffset &amp;&amp; cell.y &lt;= this.y + 8 + hitBoxOffset)) {
+<span class="fc" id="L254">                cell.collide(app, game); </span>
+            }
+        }
+<span class="fc" id="L257">    }</span>
+
+    /**
+    * Check whether Waka is colliding with a ghost and call ghost's collide method if collision has occured.
+    * @param game The Game object
+    */
+    public void checkGhostCollision(Game game) {
+<span class="fc bfc" id="L264" title="All 2 branches covered.">        for (Ghost ghost : game.ghostList) {</span>
+            // x-coordinates or y-coordinates overlap
+<span class="fc bfc" id="L266" title="All 8 branches covered.">            if ((ghost.x + 23 &gt;= this.x &amp;&amp; ghost.x &lt;= this.x + 23) &amp;&amp; (ghost.y + 23 &gt;= this.y &amp;&amp; ghost.y &lt;= this.y + 23)) {</span>
+<span class="fc" id="L267">                ghost.collide(game);</span>
+            }
+<span class="fc" id="L269">        }</span>
+<span class="fc" id="L270">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

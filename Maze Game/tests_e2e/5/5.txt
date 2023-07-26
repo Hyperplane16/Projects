@@ -1,0 +1,1 @@
+Exiting the game with "Q" should always leave the game gracefully, even if moves have already been made.

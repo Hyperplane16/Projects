@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Ghost.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Waka</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">Ghost.java</span></div><h1>Ghost.java</h1><pre class="source lang-java linenums">package game;
+
+import processing.core.PImage;
+import java.util.*;
+
+/**
+* Ghost superclass which manages all aspects of ghost functionality.
+*/
+public abstract class Ghost extends GameObject implements Character {
+    /**
+    * The current velocity in the x direction.
+    */
+    public int xVelocity;
+    /**
+    * The current velocity in the y direction.
+    */
+    public int yVelocity;
+    /**
+    * List of cardinal directions of which the ghost aims to follow.
+    * &lt;br&gt;
+    * (left, right, up, down)
+    */
+    public ArrayList&lt;String&gt; directionList;
+    /**
+    * The PImage sprite of the frightened ghost.
+    */
+    public PImage frightenedSprite;
+    /**
+    * The PImage sprite of the invisible ghost.
+    */
+    public PImage invisibleSprite;
+    /**
+    * The standard PImage sprite of the ghost.
+    */
+    public PImage standardSprite;
+    /**
+    * Whether the ghost is currently alive or not.
+    */
+    public boolean alive;
+    /**
+    * Stores the current mode of the ghost as an integer.
+    * &lt;br&gt;
+    * Mode of action (0 = normal, 1 = frightened, 2 = invisible)
+    */
+    public int ghostMode;
+
+    /**
+    * Initialises further variables of the ghost object.
+    * @param x The x coordinate
+    * @param y The y coordinate
+    * @param sprite The object's sprite
+    */
+    public Ghost(int x, int y, PImage sprite) {
+<span class="fc" id="L54">        super(x, y, sprite);</span>
+
+<span class="fc" id="L56">        this.xVelocity = 0;</span>
+<span class="fc" id="L57">        this.yVelocity = 0;</span>
+<span class="fc" id="L58">        this.alive = true;</span>
+<span class="fc" id="L59">        this.ghostMode = 0;</span>
+    
+<span class="fc" id="L61">        this.directionList = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L62">        this.standardSprite = this.sprite;</span>
+<span class="fc" id="L63">    }</span>
+
+    public void tick(App app, Game game) {
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (this.alive == true) {</span>
+<span class="fc" id="L67">            this.x += this.xVelocity;</span>
+<span class="fc" id="L68">            this.y += this.yVelocity;</span>
+
+<span class="fc" id="L70">            this.setTargetDirection(game); // Sets the direction hierarchy</span>
+<span class="fc" id="L71">            this.followTarget(game); // Movement for ghost to follow the above hierarchy</span>
+            // Note that reverse movement of ghosts is checked by a function called within followTarget()
+        }
+<span class="fc" id="L74">    }</span>
+
+    public void draw(App app, Game game) {
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (this.alive == true) {</span>
+            // Changing ghost opacity for invisible mode (processing: tint is a on/off switch)
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">            if (this.ghostMode == 2) { // If in invisible mode</span>
+<span class="nc" id="L80">                app.tint(0xff, 100); // Make ghosts transparent (value discretionary)</span>
+            }
+<span class="fc" id="L82">            app.image(this.sprite, this.x, this.y);</span>
+<span class="fc" id="L83">            this.drawDebug(app, game); // Debug mode</span>
+<span class="fc" id="L84">            app.tint(0xff, 255); // Reset tint value</span>
+        }
+<span class="fc" id="L86">    }</span>
+
+    public void setSpeed(int xVelocity, int yVelocity) {
+<span class="fc" id="L89">        this.xVelocity = xVelocity;</span>
+<span class="fc" id="L90">        this.yVelocity = yVelocity;</span>
+<span class="fc" id="L91">    }</span>
+
+    public void changeSprite() { 
+        // Change from the standard sprite to a special sprite and back
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (this.ghostMode == 1) {</span>
+<span class="fc" id="L96">            this.sprite = this.frightenedSprite;</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        } else if (this.ghostMode == 2) {</span>
+<span class="fc" id="L98">            this.sprite = this.invisibleSprite;</span>
+        } else {
+<span class="fc" id="L100">            this.sprite = this.standardSprite;</span>
+        }
+<span class="fc" id="L102">    }</span>
+
+    // Reset ghost characteristics (when Waka loses a life)
+    public void reset() {
+<span class="fc" id="L106">        this.x = this.xSpawn;</span>
+<span class="fc" id="L107">        this.y = this.ySpawn;</span>
+<span class="fc" id="L108">        this.xVelocity = 0;</span>
+<span class="fc" id="L109">        this.yVelocity = 0;</span>
+<span class="fc" id="L110">        this.alive = true;</span>
+<span class="fc" id="L111">        this.sprite = this.standardSprite;</span>
+
+<span class="fc" id="L113">        this.ghostMode = 0; // Revert to standard ghost mode</span>
+<span class="fc" id="L114">        this.changeSprite();</span>
+<span class="fc" id="L115">    }</span>
+ 
+    // Target method to be overriden in individual ghost classes
+    /**
+    * Overriden method which determines the distance from the ghost's current position to the target position.
+    * @param game The Game object.
+    * @return A list containing the x distance and y distance to the target.
+    */
+    public abstract ArrayList&lt;Integer&gt; target(Game game);
+
+    // Conduct action if collision with ghost occurs
+    /**
+    * When collision with Waka occurs change the state of the game depending on the current attributes.
+    * @param game The Game object
+    */
+    public void collide(Game game) {
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        if (this.ghostMode == 1) { // Frightened mode</span>
+<span class="fc" id="L132">            this.alive = false;</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        } else if (this.alive == true) {</span>
+<span class="fc" id="L134">            game.lives -= 1;</span>
+<span class="fc" id="L135">            game.resetSpawn();</span>
+        }
+<span class="fc" id="L137">    }</span>
+
+    // ____________________________________________________________________________________________
+
+    // Draw a line from the ghost to the target is debug mode is active
+    /**
+    * When debug mode is active draw a white line from the centre of the ghost to its target position.
+    * @param app The App object
+    * @param game The Game object
+    */
+    public void drawDebug(App app, Game game) {
+        // If debug mode is active and default ghost mode, draw debug target lines
+<span class="pc bpc" id="L149" title="1 of 4 branches missed.">        if (game.debugMode == false || this.ghostMode != 0) {</span>
+<span class="fc" id="L150">            return;</span>
+        }
+        // Find the target position
+<span class="nc" id="L153">        ArrayList&lt;Integer&gt; lengthDifferences = getTarget(game);</span>
+<span class="nc" id="L154">        int xTarget = lengthDifferences.get(0) + this.getCx(game.GHOSTOFFSET);</span>
+<span class="nc" id="L155">        int yTarget = lengthDifferences.get(1) + this.getCy(game.GHOSTOFFSET);</span>
+
+<span class="nc" id="L157">        app.stroke(255); // Draw a white line from ghost position to target position</span>
+<span class="nc" id="L158">        app.line(this.getCx(game.GHOSTOFFSET) + 14 - game.GHOSTOFFSET, this.getCy(game.GHOSTOFFSET) + 14 - game.GHOSTOFFSET, </span>
+        xTarget + 8, yTarget + 8); 
+<span class="nc" id="L160">    }</span>
+
+    // Find the difference in x and y lengths from the current ghost position to target
+    // Returns a list of ints with x and y difference respectively
+    /**
+    * Retrieves a list containing the x and y distances to the target and manipulate it to fit
+    * certain conditions. 
+    * &lt;br&gt;
+    * (if frightened or invisible use randomised target positions, if outside the grid bounds set them to
+    * be within)
+    * @param game The Game object
+    * @return A list containing the modified x distance and y distance to the target.
+    */
+    public ArrayList&lt;Integer&gt; getTarget(Game game) {
+<span class="fc" id="L174">        ArrayList&lt;Integer&gt; lengthDifferences = new ArrayList&lt;Integer&gt;();</span>
+<span class="fc" id="L175">        lengthDifferences = this.target(game);</span>
+        
+        // Randomise positions if not standard movement
+<span class="fc bfc" id="L178" title="All 4 branches covered.">        if (this.ghostMode == 1 || this.ghostMode == 2) {</span>
+<span class="fc" id="L179">            Random random = new Random();</span>
+            // Random number between -27*16 and 27*16
+<span class="fc" id="L181">            lengthDifferences.set(0, random.nextInt(2 * 27 * game.GRIDSPACE) - 27 * game.GRIDSPACE);</span>
+            // Random number between -35*16 and 35*16
+<span class="fc" id="L183">            lengthDifferences.set(1, random.nextInt(2 * 35 * game.GRIDSPACE) - 35 * game.GRIDSPACE);</span>
+        }
+
+        // Setting targets within the grid bounds if outside
+<span class="fc" id="L187">        int xTarget = lengthDifferences.get(0) + this.getCx(game.GHOSTOFFSET);</span>
+<span class="fc" id="L188">        int yTarget = lengthDifferences.get(1) + this.getCy(game.GHOSTOFFSET);</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">        if (xTarget &lt; 0) {</span>
+<span class="fc" id="L190">            lengthDifferences.set(0, 0 - this.getCx(game.GHOSTOFFSET));</span>
+        } 
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        if (xTarget &gt; 27 * game.GRIDSPACE) {</span>
+<span class="fc" id="L193">            lengthDifferences.set(0, 27 * game.GRIDSPACE - this.getCx(game.GHOSTOFFSET));</span>
+        }
+<span class="fc bfc" id="L195" title="All 2 branches covered.">        if (yTarget &lt; 0) {</span>
+<span class="fc" id="L196">            lengthDifferences.set(1, 0 - this.getCy(game.GHOSTOFFSET));</span>
+        } 
+<span class="fc bfc" id="L198" title="All 2 branches covered.">        if (yTarget &gt; 35 * game.GRIDSPACE) {</span>
+<span class="fc" id="L199">            lengthDifferences.set(1, 35 * game.GRIDSPACE - this.getCy(game.GHOSTOFFSET));</span>
+        }
+<span class="fc" id="L201">        return lengthDifferences;</span>
+    }
+
+    // ____________________________________________________________________________________________
+
+    /**
+    * Using the difference in lengths from the ghost's target, derive a hierarchy of directions for 
+    * which a ghost should decide to move in at an intersection.
+    * @param game The Game object
+    */
+    public void setTargetDirection(Game game) {
+        // Consider movement direction only at the middle of a cell
+<span class="fc bfc" id="L213" title="All 2 branches covered.">        if (this.isCentre(game.GHOSTOFFSET) == false) {</span>
+<span class="fc" id="L214">            return;</span>
+        }
+<span class="fc" id="L216">        ArrayList&lt;Integer&gt; lengthDifferences = this.getTarget(game);</span>
+<span class="fc" id="L217">        int xDifference = lengthDifferences.get(0);</span>
+<span class="fc" id="L218">        int yDifference = lengthDifferences.get(1);</span>
+<span class="fc" id="L219">        ArrayList&lt;String&gt; directionList = new ArrayList&lt;String&gt;();</span>
+
+        // First determine the magnitude of difference in terms of x and y
+        // Then determine whether the target is left, right, above or below
+<span class="fc bfc" id="L223" title="All 2 branches covered.">        if (Math.abs(xDifference) &gt;= Math.abs(yDifference)) { // Move left or right first</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">            if (xDifference &gt;= 0) {</span>
+<span class="fc" id="L225">                directionList.add(&quot;right&quot;);</span>
+            } else {
+<span class="fc" id="L227">                directionList.add(&quot;left&quot;);</span>
+            }
+<span class="fc bfc" id="L229" title="All 2 branches covered.">            if (yDifference &gt;= 0) {</span>
+<span class="fc" id="L230">                directionList.add(&quot;down&quot;);</span>
+<span class="fc" id="L231">                directionList.add(&quot;up&quot;);</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">                if (directionList.contains(&quot;right&quot;)) {</span>
+<span class="fc" id="L233">                    directionList.add(&quot;left&quot;);</span>
+                } else {
+<span class="fc" id="L235">                    directionList.add(&quot;right&quot;);</span>
+                }
+            } else {
+<span class="fc" id="L238">                directionList.add(&quot;up&quot;);</span>
+<span class="fc" id="L239">                directionList.add(&quot;down&quot;);</span>
+<span class="fc bfc" id="L240" title="All 2 branches covered.">                if (directionList.contains(&quot;right&quot;)) {</span>
+<span class="fc" id="L241">                    directionList.add(&quot;left&quot;);</span>
+                } else {
+<span class="fc" id="L243">                    directionList.add(&quot;right&quot;);</span>
+                }
+            }
+        } else { // Move up or down first
+<span class="fc bfc" id="L247" title="All 2 branches covered.">            if (yDifference &gt;= 0) {</span>
+<span class="fc" id="L248">                directionList.add(&quot;down&quot;);</span>
+            } else {
+<span class="fc" id="L250">                directionList.add(&quot;up&quot;);</span>
+            }
+<span class="fc bfc" id="L252" title="All 2 branches covered.">            if (xDifference &gt;= 0) {</span>
+<span class="fc" id="L253">                directionList.add(&quot;right&quot;);</span>
+<span class="fc" id="L254">                directionList.add(&quot;left&quot;);</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">                if (directionList.contains(&quot;down&quot;)) {</span>
+<span class="fc" id="L256">                    directionList.add(&quot;up&quot;);</span>
+                } else {
+<span class="fc" id="L258">                    directionList.add(&quot;down&quot;);</span>
+                }
+            } else {
+<span class="fc" id="L261">                directionList.add(&quot;left&quot;);</span>
+<span class="fc" id="L262">                directionList.add(&quot;right&quot;);</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">                if (directionList.contains(&quot;down&quot;)) {</span>
+<span class="fc" id="L264">                    directionList.add(&quot;up&quot;);</span>
+                } else {
+<span class="fc" id="L266">                    directionList.add(&quot;down&quot;);</span>
+                }
+            }
+        }
+<span class="fc" id="L270">        this.directionList = directionList;</span>
+<span class="fc" id="L271">    }</span>
+
+    // ____________________________________________________________________________________________
+
+    /**
+    * Iterate through the ghost's direction hierarchy and attempt to follow it in order, if it is possible to
+    * turn in that direction. 
+    * &lt;br&gt;
+    * Additionally allows ghosts to move backwards from where they came from only if it's a dead-end.
+    * &lt;br&gt;
+    * &lt;br&gt;
+    * NOTE: Calls the method conductReverseMovement() within this method.
+    * @param game The Game object
+    */
+    public void followTarget(Game game) {
+        // Consider movement direction only at the middle of a cell
+<span class="fc bfc" id="L287" title="All 2 branches covered.">        if (this.isCentre(game.GHOSTOFFSET) == false) {</span>
+<span class="fc" id="L288">            return;</span>
+        }
+
+<span class="fc bfc" id="L291" title="All 2 branches covered.">        for (String direction : this.directionList) {</span>
+<span class="fc" id="L292">            int counter = 0;</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">            for (Wall wall : game.wallList) {</span>
+                // LEFT
+<span class="fc bfc" id="L295" title="All 2 branches covered.">                if (direction == &quot;left&quot;) {</span>
+                    // Consider the cell to the left of the current
+<span class="pc bpc" id="L297" title="1 of 4 branches missed.">                    if (wall.x == this.getCx(game.GHOSTOFFSET) - 16 &amp;&amp; wall.y == this.getCy(game.GHOSTOFFSET)) {</span>
+<span class="fc" id="L298">                        break;</span>
+                    }
+                    // If a wall in this direction is not found and not moving in opposite direction, turn
+<span class="fc bfc" id="L301" title="All 4 branches covered.">                    if (counter == game.wallList.size()-1 &amp;&amp; this.xVelocity &lt;= 0) {</span>
+<span class="fc" id="L302">                        this.setSpeed(-game.speed, 0);</span>
+<span class="fc" id="L303">                        return;</span>
+                    }
+                }
+                // RIGHT
+<span class="fc bfc" id="L307" title="All 2 branches covered.">                else if (direction == &quot;right&quot;) {</span>
+                    // Consider the cell to the right of the current
+<span class="pc bpc" id="L309" title="1 of 4 branches missed.">                    if (wall.x == this.getCx(game.GHOSTOFFSET) + 16 &amp;&amp; wall.y == this.getCy(game.GHOSTOFFSET)) {</span>
+<span class="fc" id="L310">                        break;</span>
+                    }
+                    // If a wall in this direction is not found and not moving in opposite direction, turn
+<span class="fc bfc" id="L313" title="All 4 branches covered.">                    if (counter == game.wallList.size()-1 &amp;&amp; this.xVelocity &gt;= 0) {</span>
+<span class="fc" id="L314">                        this.setSpeed(game.speed, 0);</span>
+<span class="fc" id="L315">                        return;</span>
+                    }
+                }
+                // UP
+<span class="fc bfc" id="L319" title="All 2 branches covered.">                else if (direction == &quot;up&quot;) {</span>
+                    // Consider the cell above the current
+<span class="fc bfc" id="L321" title="All 4 branches covered.">                    if (wall.x == this.getCx(game.GHOSTOFFSET) &amp;&amp; wall.y == this.getCy(game.GHOSTOFFSET) - 16) {</span>
+<span class="fc" id="L322">                        break;</span>
+                    }
+                    // If a wall in this direction is not found, turn
+<span class="fc bfc" id="L325" title="All 4 branches covered.">                    if (counter == game.wallList.size()-1 &amp;&amp; this.yVelocity &lt;= 0) {</span>
+<span class="fc" id="L326">                        this.setSpeed(0, -game.speed);</span>
+<span class="fc" id="L327">                        return;</span>
+                    }
+                }
+                // DOWN
+<span class="pc bpc" id="L331" title="1 of 2 branches missed.">                else if (direction == &quot;down&quot;) {</span>
+                    // Consider the cell to the right of the current
+<span class="fc bfc" id="L333" title="All 4 branches covered.">                    if (wall.x == this.getCx(game.GHOSTOFFSET) &amp;&amp; wall.y == this.getCy(game.GHOSTOFFSET) + 16) {</span>
+<span class="fc" id="L334">                        break;</span>
+                    }
+                    // If a wall in this direction is not found and not moving in opposite direction, turn
+<span class="fc bfc" id="L337" title="All 4 branches covered.">                    if (counter == game.wallList.size()-1 &amp;&amp; this.yVelocity &gt;= 0) {</span>
+<span class="fc" id="L338">                        this.setSpeed(0, game.speed);</span>
+<span class="fc" id="L339">                        return;</span>
+                    }
+                }
+<span class="fc" id="L342">                counter += 1;</span>
+<span class="fc" id="L343">            }</span>
+<span class="fc" id="L344">        }</span>
+
+        // ________________________________________________________________________________________
+
+<span class="fc" id="L348">        this.conductReverseMovement(game);</span>
+<span class="fc" id="L349">    }</span>
+
+    /**
+    * Allow ghosts to rebound in the direction they came from if and only if they reach a dead-end.
+    * &lt;br&gt;
+    * &lt;br&gt;
+    * NOTE: This method is called within followTarget()
+    * @param game The Game object
+    */
+    public void conductReverseMovement(Game game) {
+<span class="fc bfc" id="L359" title="All 2 branches covered.">        if (xVelocity &gt; 0) { // Currently moving RIGHT</span>
+<span class="fc" id="L360">            this.setSpeed(-game.speed, 0);</span>
+<span class="fc bfc" id="L361" title="All 2 branches covered.">        } else if (xVelocity &lt; 0) { // Currently moving LEFT</span>
+<span class="fc" id="L362">            this.setSpeed(game.speed, 0);</span>
+<span class="fc bfc" id="L363" title="All 2 branches covered.">        } else if (yVelocity &gt; 0) { // Currently moving DOWN</span>
+<span class="fc" id="L364">            this.setSpeed(0, -game.speed);</span>
+<span class="pc bpc" id="L365" title="1 of 2 branches missed.">        } else if (yVelocity &lt; 0) { // Currently moving UP</span>
+<span class="fc" id="L366">            this.setSpeed(0, game.speed);</span>
+        } 
+<span class="fc" id="L368">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,1 @@
+Sucessful game but maze has open areas that need to be treated as impassable walls

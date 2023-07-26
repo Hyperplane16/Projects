@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="game.GhostTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2020-11-22T10:29:07" hostname="LAPTOP-VROLHKP5" time="0.613">
+  <properties/>
+  <testcase name="setTargetDirectionTest()" classname="game.GhostTest" time="0.06"/>
+  <testcase name="followTargetTest()" classname="game.GhostTest" time="0.087"/>
+  <testcase name="drawDebugTest()" classname="game.GhostTest" time="0.07"/>
+  <testcase name="reset()" classname="game.GhostTest" time="0.081"/>
+  <testcase name="getTargetTest()" classname="game.GhostTest" time="0.066"/>
+  <testcase name="collideTest()" classname="game.GhostTest" time="0.084"/>
+  <testcase name="tickTest()" classname="game.GhostTest" time="0.073"/>
+  <testcase name="changeSpriteTest()" classname="game.GhostTest" time="0.08"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

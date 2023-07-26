@@ -1,0 +1,45 @@
+A server and client pair has been successfully created. In particular,
+client.c is a fully-fledged user client interface, allowing users to input 
+qualitative protocol commands by STDIN and generates the binary protocols.
+Data is returned from the server and printed simultaneously to STDOUT.
+
+For example: 
+CONNECT <identifer> <domain>
+SAY <message...> <message...> ...
+SAYCONT <message...>
+- [SYSTEM Input Terminator] <value>
+DISCONNECT
+
+The PING/PONG extension has been implemented.
+
+// -----
+// TESTS
+// -----
+
+// CONNECTION
+Tests a standard user connection and that the pipes are created
+
+// DISCONNECTION
+Tests a standard user disconnection sequence, and that the pipes are
+successfully removed afterward
+
+// DOMAIN CONDITIONS
+Tests that edge cases in domain naming are properly managed
+
+// PING PONG
+Tests that the PING protocol is correctly sent in 15 seconds and not
+prematurely
+
+// PONG NOT RECEIVED
+Tests that if the client does not send back PONG, after 1t seconds
+the pipes will be removed
+
+// POOR GEVENT DATA
+Tests that invalid gevent data has no affect on the environment
+
+// SAYCONT REVCONT TERM
+Tests that two clients can communicate using the protocols, and that
+the terminating byte is preserved
+
+// STANDARD SAY REVC
+Tests that two clients can communicate using the protocols bidirectionally.

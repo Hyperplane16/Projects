@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="game.WakaTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2020-11-22T10:29:08" hostname="LAPTOP-VROLHKP5" time="0.707">
+  <properties/>
+  <testcase name="conductQueuedMovementTest()" classname="game.WakaTest" time="0.079"/>
+  <testcase name="conductReverseDirectionTest()" classname="game.WakaTest" time="0.081"/>
+  <testcase name="checkWallCollisionTest()" classname="game.WakaTest" time="0.081"/>
+  <testcase name="checkGhostCollisionTest()" classname="game.WakaTest" time="0.081"/>
+  <testcase name="checkFruitCollisionTest()" classname="game.WakaTest" time="0.092"/>
+  <testcase name="tickTest()" classname="game.WakaTest" time="0.079"/>
+  <testcase name="changeSpriteTest()" classname="game.WakaTest" time="0.108"/>
+  <testcase name="resetTest()" classname="game.WakaTest" time="0.09"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

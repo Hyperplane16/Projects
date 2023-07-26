@@ -1,0 +1,66 @@
+// -----
+// TESTS
+// -----
+
+Each testcase, written in .asm assembly files, from which each binary is obtained from, are stored
+in /tests, with the exception of "too_many_functions" where the original is in /tests_setup.
+
+The binary is parsed and compared to the .asm files as the objdump_x2017 correctness, 
+and with the .out files as the vm_x2017 correctness. For the latter, output scripts
+specifically have the exit code appended on a newline at the end so the textual 
+output can also be compared simultaneously. 
+
+// DESCRIPTIONS (alphebetical)
+
+// altering_jmp_line
+Tests the ability to perform ADD and MOV operations on the program counter and for
+the execution flow to alter correctly
+
+// entrypoint_not_at_start
+Tests if the function label 0 can be correctly located even if it's not the first function
+listed in the file
+
+// every_multiple_of_16
+Prints out every multiple of 16 up to 256
+
+// illegal_register
+Tests that you cannot access a personal register
+
+// jmp_past_function
+Tests that an edit to the PC that points to an instruction outside of the current
+function is not allowed
+
+// jmp_past_memory
+Tests that if an edit to the PC points to an instruction outside of the 256 possible
+instructions in program memory, this is disallowed
+
+// multiple_entrypoints
+Tests that if there are multiple function label 0s, an error is returned
+
+// multiple_labels
+General test with multiple function calls
+
+// multiple_operations
+General test with multiple operation types
+
+// no_entrypoint
+Tests that if there is no function label 0, an error is returned
+
+// not_and_eq
+Tests the functionality of the NOT and EQU operations
+
+// sample_program
+The supplied program in the default test case file
+
+// too_many_functions
+If given more than 9 functions in the binary file, the programs should return an error
+
+// triple_indirection
+Testing using REF indirection three times then deferencing back to the original 
+memory location to alter its contents
+
+// uninitialised_pointer
+Trying to access a stack symbol as a pointer if it has not yet been initialised
+
+// uninitialised_stack_variable
+Trying to retreive data from a stack variable that has not be initialised yet

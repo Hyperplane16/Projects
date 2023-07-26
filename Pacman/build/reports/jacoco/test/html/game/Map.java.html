@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Map.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Waka</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">Map.java</span></div><h1>Map.java</h1><pre class="source lang-java linenums">package game;
+
+import processing.core.PImage;
+import org.json.simple.*;
+import org.json.simple.parser.*;
+import java.util.*;
+import java.io.*;
+
+/**
+* Stores static methods for parsing configuration and map files to be stored in the game object.
+*/
+<span class="nc" id="L12">public abstract class Map {</span>
+    /**
+    * Parse the map file and instantiate all the resource objects into their respective lists of 
+    * the game object.
+    * &lt;br&gt;
+    * &lt;br&gt;
+    * NOTE: This is the only location in the main source code files where resource sprites/fonts are
+    * loaded.
+    * @param app The App object
+    * @param game The Game object
+    */
+    public static void parseObject(App app, Game game) {
+<span class="nc" id="L24">        game.wallList = new ArrayList&lt;Wall&gt;();</span>
+<span class="nc" id="L25">        game.ghostList = new ArrayList&lt;Ghost&gt;();</span>
+<span class="nc" id="L26">        game.consumableList = new ArrayList&lt;Consumable&gt;();</span>
+        // Create the font for the end screen given a .ttf file
+<span class="nc" id="L28">        game.font = app.createFont(&quot;PressStart2P-Regular.ttf&quot;, 24);</span>
+
+<span class="nc" id="L30">        File f = new File(game.mapfile);</span>
+        try {
+<span class="nc" id="L32">            Scanner scan = new Scanner(f);</span>
+            // Column and row are reversed to fit the inverted drawing coordinates
+<span class="nc" id="L34">            int y = 0;</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">            while (scan.hasNextLine() == true) { // Initiate cell objects for each line</span>
+<span class="nc" id="L36">                String[] line = scan.nextLine().split(&quot;&quot;);</span>
+<span class="nc" id="L37">                int x = 0;</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">                for (String s : line) {</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">                    if (s.equals(&quot;p&quot;)) { // Waka's Starting Point</span>
+<span class="nc" id="L40">                        game.waka = new Waka(x * game.GRIDSPACE - game.WAKAOFFSET, y * game.GRIDSPACE</span>
+                                - game.WAKAOFFSET);
+<span class="nc" id="L42">                        game.waka.playerRight = app.loadImage(&quot;playerRight.png&quot;);</span>
+<span class="nc" id="L43">                        game.waka.playerLeft = app.loadImage(&quot;playerLeft.png&quot;);</span>
+<span class="nc" id="L44">                        game.waka.playerUp = app.loadImage(&quot;playerUp.png&quot;);</span>
+<span class="nc" id="L45">                        game.waka.playerDown = app.loadImage(&quot;playerDown.png&quot;);</span>
+<span class="nc" id="L46">                        game.waka.playerClosed = app.loadImage(&quot;playerClosed.png&quot;);</span>
+<span class="nc" id="L47">                        game.waka.sprite = game.waka.playerLeft;</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">                    } else if (s.equals(&quot;a&quot;)) { // Ambusher's Starting Point</span>
+<span class="nc" id="L49">                        Ambusher g = new Ambusher(x * game.GRIDSPACE - game.GHOSTOFFSET, y * game.GRIDSPACE</span>
+<span class="nc" id="L50">                                - game.GHOSTOFFSET, app.loadImage(&quot;ambusher.png&quot;));</span>
+<span class="nc" id="L51">                        g.setSpeed(-game.speed, 0);</span>
+<span class="nc" id="L52">                        g.frightenedSprite = app.loadImage(&quot;frightened.png&quot;);</span>
+<span class="nc" id="L53">                        g.invisibleSprite = app.loadImage(&quot;invisible.png&quot;);</span>
+<span class="nc" id="L54">                        game.ghostList.add(g);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                    } else if (s.equals(&quot;c&quot;)) { // Chaser's Starting Point</span>
+<span class="nc" id="L56">                        Chaser g = new Chaser(x * game.GRIDSPACE - game.GHOSTOFFSET, y * game.GRIDSPACE</span>
+<span class="nc" id="L57">                                - game.GHOSTOFFSET, app.loadImage(&quot;chaser.png&quot;));</span>
+<span class="nc" id="L58">                        g.setSpeed(-game.speed, 0);</span>
+<span class="nc" id="L59">                        g.frightenedSprite = app.loadImage(&quot;frightened.png&quot;);</span>
+<span class="nc" id="L60">                        g.invisibleSprite = app.loadImage(&quot;invisible.png&quot;);</span>
+<span class="nc" id="L61">                        game.ghostList.add(g);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">                    } else if (s.equals(&quot;i&quot;)) { // Ignorant's Starting Point</span>
+<span class="nc" id="L63">                        Ignorant g = new Ignorant(x * game.GRIDSPACE - game.GHOSTOFFSET, y * game.GRIDSPACE</span>
+<span class="nc" id="L64">                                - game.GHOSTOFFSET, app.loadImage(&quot;ignorant.png&quot;));</span>
+<span class="nc" id="L65">                        g.setSpeed(-game.speed, 0);</span>
+<span class="nc" id="L66">                        g.frightenedSprite = app.loadImage(&quot;frightened.png&quot;);</span>
+<span class="nc" id="L67">                        g.invisibleSprite = app.loadImage(&quot;invisible.png&quot;);</span>
+<span class="nc" id="L68">                        game.ghostList.add(g);</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">                    } else if (s.equals(&quot;w&quot;)) { // Whim's Starting Point</span>
+<span class="nc" id="L70">                        Whim g = new Whim(x * game.GRIDSPACE - game.GHOSTOFFSET, y * game.GRIDSPACE</span>
+<span class="nc" id="L71">                                - game.GHOSTOFFSET, app.loadImage(&quot;whim.png&quot;));</span>
+<span class="nc" id="L72">                        g.setSpeed(-game.speed, 0);</span>
+<span class="nc" id="L73">                        g.frightenedSprite = app.loadImage(&quot;frightened.png&quot;);</span>
+<span class="nc" id="L74">                        g.invisibleSprite = app.loadImage(&quot;invisible.png&quot;);</span>
+<span class="nc" id="L75">                        game.ghostList.add(g);</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">                    } else if (s.equals(&quot;1&quot;)) { // Horizontal Wall</span>
+<span class="nc" id="L77">                        game.wallList.add(new Wall(x * game.GRIDSPACE, y * game.GRIDSPACE, </span>
+<span class="nc" id="L78">                                app.loadImage(&quot;horizontal.png&quot;)));</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">                    } else if (s.equals(&quot;2&quot;)) { // Vertical Wall</span>
+<span class="nc" id="L80">                        game.wallList.add(new Wall(x * game.GRIDSPACE, y * game.GRIDSPACE, </span>
+<span class="nc" id="L81">                                app.loadImage(&quot;vertical.png&quot;)));</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">                    } else if (s.equals(&quot;3&quot;)) { // upLeft Wall</span>
+<span class="nc" id="L83">                        game.wallList.add(new Wall(x * game.GRIDSPACE, y * game.GRIDSPACE, </span>
+<span class="nc" id="L84">                                app.loadImage(&quot;upLeft.png&quot;)));</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">                    } else if (s.equals(&quot;4&quot;)) { // upRight Wall</span>
+<span class="nc" id="L86">                        game.wallList.add(new Wall(x * game.GRIDSPACE, y * game.GRIDSPACE, </span>
+<span class="nc" id="L87">                                app.loadImage(&quot;upRight.png&quot;)));</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">                    } else if (s.equals(&quot;5&quot;)) { // downLeft Wall</span>
+<span class="nc" id="L89">                        game.wallList.add(new Wall(x * game.GRIDSPACE, y * game.GRIDSPACE, </span>
+<span class="nc" id="L90">                                app.loadImage(&quot;downLeft.png&quot;)));</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">                    } else if (s.equals(&quot;6&quot;)) { // downRight Wall</span>
+<span class="nc" id="L92">                        game.wallList.add(new Wall(x * game.GRIDSPACE, y * game.GRIDSPACE, </span>
+<span class="nc" id="L93">                                app.loadImage(&quot;downRight.png&quot;)));</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">                    } else if (s.equals(&quot;7&quot;)) { // Fruit</span>
+<span class="nc" id="L95">                        game.consumableList.add(new Fruit(x * game.GRIDSPACE, y * game.GRIDSPACE, </span>
+<span class="nc" id="L96">                                app.loadImage(&quot;fruit.png&quot;)));</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">                    } else if (s.equals(&quot;8&quot;)) { // SuperFruit</span>
+                        // Offset values to centre the super fruit cherry: 4
+<span class="nc" id="L99">                        game.consumableList.add(new SuperFruit(x * game.GRIDSPACE - 4, y * game.GRIDSPACE - 4,</span>
+<span class="nc" id="L100">                                app.loadImage(&quot;superFruit.png&quot;)));</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">                    } else if (s.equals(&quot;9&quot;)) { // SodaCan</span>
+                        // Offset values to centre the soda can sprite: 4
+<span class="nc" id="L103">                        game.consumableList.add(new SodaCan(x * game.GRIDSPACE - 4, y * game.GRIDSPACE - 4, </span>
+<span class="nc" id="L104">                                app.loadImage(&quot;sodaCan.png&quot;)));</span>
+                    }
+<span class="nc" id="L106">                    x += 1;</span>
+                }
+<span class="nc" id="L108">                y += 1;</span>
+<span class="nc" id="L109">            }</span>
+<span class="nc" id="L110">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L111">            e.printStackTrace();</span>
+<span class="nc" id="L112">        }</span>
+<span class="nc" id="L113">    } </span>
+
+    /**
+    * Parse the configuration file and set its data as the game's attributes.
+    * @param game The Game object
+    * @param filename The name of the configuration file
+    */
+    @SuppressWarnings(&quot;unchecked&quot;) // Passing from JSON object always produces an unchecked exception
+    public static void parseData(Game game, String filename) {
+<span class="nc" id="L122">        JSONParser parser = new JSONParser();</span>
+        try {
+            // Use JSON.simple's parsing methods
+<span class="nc" id="L125">            Reader read = new FileReader(filename);</span>
+<span class="nc" id="L126">            JSONObject obj = (JSONObject)parser.parse(read);</span>
+
+            // Retreive all data sections of the file
+<span class="nc" id="L129">            String mapfile = (String)obj.get(&quot;map&quot;);</span>
+<span class="nc" id="L130">            Long livesLong = (Long)obj.get(&quot;lives&quot;);</span>
+<span class="nc" id="L131">            int lives = livesLong.intValue();</span>
+<span class="nc" id="L132">            Long speedLong = (Long)obj.get(&quot;speed&quot;);</span>
+<span class="nc" id="L133">            int speed = speedLong.intValue();</span>
+<span class="nc" id="L134">            Long frightenedLong = (Long)obj.get(&quot;frightenedLength&quot;);</span>
+<span class="nc" id="L135">            int frightenedLength = frightenedLong.intValue();</span>
+<span class="nc" id="L136">            Long invisibleLong = (Long)obj.get(&quot;invisibleLength&quot;);</span>
+<span class="nc" id="L137">            int invisibleLength = invisibleLong.intValue();</span>
+
+<span class="nc" id="L139">            JSONArray array = (JSONArray)obj.get(&quot;modeLengths&quot;);</span>
+<span class="nc" id="L140">            Iterator&lt;Long&gt; iterator = array.iterator();</span>
+<span class="nc" id="L141">            int[] modeLengths = new int[array.size()];</span>
+<span class="nc" id="L142">            int i = 0;</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">            while (iterator.hasNext()) { // Iterate through the modeLengths and add to array</span>
+<span class="nc" id="L144">                Long lengthLong = (Long)iterator.next();</span>
+<span class="nc" id="L145">                int length = lengthLong.intValue();</span>
+<span class="nc" id="L146">                modeLengths[i] = length;</span>
+<span class="nc" id="L147">                i += 1;</span>
+<span class="nc" id="L148">            }</span>
+
+<span class="nc" id="L150">            game.mapfile = mapfile;</span>
+<span class="nc" id="L151">            game.lives = lives;</span>
+<span class="nc" id="L152">            game.speed = speed;</span>
+<span class="nc" id="L153">            game.frightenedLength = frightenedLength;</span>
+<span class="nc" id="L154">            game.invisibleLength = invisibleLength;</span>
+<span class="nc" id="L155">            game.modeLengths = modeLengths;</span>
+<span class="nc" id="L156">            game.modeIndex = 0;</span>
+<span class="nc" id="L157">        } catch (IOException e) {</span>
+<span class="nc" id="L158">            e.printStackTrace();</span>
+<span class="nc" id="L159">        } catch (ParseException e) {</span>
+<span class="nc" id="L160">            e.printStackTrace();</span>
+<span class="nc" id="L161">        }</span>
+<span class="nc" id="L162">    }</span>
+
+    // ____________________________________________________________________________________________
+
+    /**
+    * Draw the map by iterating through each wall in the list of walls in the game and drawing the sprite.
+    * @param app The App object
+    * @param game The game object
+    */
+    public static void draw(App app, Game game) {
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        for (Wall wall : game.wallList) {</span>
+<span class="nc" id="L173">            app.image(wall.sprite, wall.x, wall.y);</span>
+<span class="nc" id="L174">        }</span>
+<span class="nc" id="L175">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

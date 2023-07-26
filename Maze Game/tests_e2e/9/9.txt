@@ -1,0 +1,2 @@
+Composite testing of a sucessful game with multiple teleport pads, water and fire objects to see if multiple elements can be
+combined with no error.

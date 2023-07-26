@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="game.AmbusherTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2020-11-22T10:29:03" hostname="LAPTOP-VROLHKP5" time="0.865">
+  <properties/>
+  <testcase name="unknownModeTest()" classname="game.AmbusherTest" time="0.637"/>
+  <testcase name="chaseModeTest()" classname="game.AmbusherTest" time="0.064"/>
+  <testcase name="scatterModeTest()" classname="game.AmbusherTest" time="0.162"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

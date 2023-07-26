@@ -1,0 +1,34 @@
+allocated 128
+allocated 64
+free 64
+allocated 128
+free 128
+free 512
+
+free 128
+allocated 64
+free 64
+allocated 128
+free 128
+free 512
+
+free 128
+allocated 64
+allocated 64
+allocated 128
+free 128
+free 512
+
+free 128
+free 64
+allocated 64
+allocated 128
+free 128
+free 512
+
+free 256
+allocated 128
+free 128
+free 512
+
+free 1024

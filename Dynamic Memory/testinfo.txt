@@ -1,0 +1,46 @@
+Tests are conducted using individual .c files. Inside the personal_tests folder is a
+shared implementation of virtual_sbrk in test_virtual_sbrk.h which all the files import
+
+Each testcase allocates the virtual memory using C's dynamic memory malloc, and sets 
+the initial program break to be equal to the start of the virtual memory
+
+// ------------------------------------------
+// Test Descriptions (sorted lexicographical)
+// ------------------------------------------
+
+// free_bad_addresses
+Calling free with NULL, invalid pointer addresses or already freed addresses
+
+// free_data_integrity
+Test that user data in a block is unaffected by multiple other mallocs and frees
+
+// free_large_correctness
+Tests a large number of malloc and free operations
+
+// free_standard
+Combination test of multiple mallocs and frees
+
+// malloc_sbrk_fail
+Tests that new blocks cannot be added if the overhead exceeds the virtual memory
+
+// malloc_size_tests
+Tests multiple malloc operations of varying sizes
+
+// malloc_small_bytes
+Testing the correctness of malloc when allocating small byte values
+
+// malloc_standard
+Standard test of multiple malloc operations
+
+// realloc_data_integrity
+Tests that user data is not altered by multiple malloc, realloc and free operations
+
+// realloc_standard
+Tests the correctness of standard realloc behaviour including freeing past data
+
+// realloc_variations
+Tests correct response in edge case inputs (e.g. ptr = NULL, size = 0)
+
+// sbrk_program_break
+Tests that the program break remains at the byte after necessary state data after a number
+of allocations and deallocations

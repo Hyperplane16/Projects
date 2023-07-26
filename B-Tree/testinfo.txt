@@ -1,0 +1,47 @@
+// -----
+// TESTS
+// -----
+
+A series of automatic testcases can be executed with the following:
+make tests
+make run_tests
+
+Each .c file in personal_tests will be linked and compiled with the "libbtreestore"
+static library. The individual gcov output files will be redirected to 
+personal_tests/coverage 
+
+.out files are used to compare the tree structure using export_print(), a function
+that uses btree_export() to print all nodes in a DFS pre-order traversal. For tests 
+that don't directly call export_print() the .out files will be empty.
+
+(Alphanumeric Order)
+// DECRYPT_STANDARD
+A standard test of searching for and decrypting the data of a node after a series 
+of inserts and deletions. Decrypted data is compared to the original plaintext
+
+// DELETE_STANDARD
+A standard composite test of many inserts and deletions
+
+// DELETE_TO_EMPTY
+Testing that it is possible to insert, then remove all inserted nodes for the tree 
+to revert back to an empty root with no keys.
+
+// INSERT_STANDARD
+A standard test of the correctness of a series of inserts
+
+// INVALID_INPUTS
+Test that invalid inputs, such as insertion when a key already exists, or NULL,
+is handled properly without unexpected changes to the tree structure
+
+// LARGE_CORRECTNESS
+Testing that the tree structure remains valid across a large number of insert
+and removal operations
+
+// RETRIEVE_STANDARD
+A standard test of node retreival, comparing the returned data with the original
+
+// TEA_CTR_ENCRYPTION
+Testing the tea_ctr functions for encryption and decryption of arbitrary data
+
+// TEA_ENCRYPTION
+Testing the tea functions for encryption and decryption of fixed data

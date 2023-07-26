@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="game.WhimTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2020-11-22T10:29:09" hostname="LAPTOP-VROLHKP5" time="0.37">
+  <properties/>
+  <testcase name="unknownModeTest()" classname="game.WhimTest" time="0.08"/>
+  <testcase name="scatterModeTest()" classname="game.WhimTest" time="0.094"/>
+  <testcase name="chaseModeTest1()" classname="game.WhimTest" time="0.091"/>
+  <testcase name="chaseModeTest2()" classname="game.WhimTest" time="0.096"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

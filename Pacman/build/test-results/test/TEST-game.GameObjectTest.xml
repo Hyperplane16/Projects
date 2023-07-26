@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="game.GameObjectTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2020-11-22T10:29:05" hostname="LAPTOP-VROLHKP5" time="0.012">
+  <properties/>
+  <testcase name="isCentreTest()" classname="game.GameObjectTest" time="0.008"/>
+  <testcase name="getCoordinatesOffset()" classname="game.GameObjectTest" time="0.001"/>
+  <testcase name="getCoordinates()" classname="game.GameObjectTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

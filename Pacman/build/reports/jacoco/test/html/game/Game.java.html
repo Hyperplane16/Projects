@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Game.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Waka</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">Game.java</span></div><h1>Game.java</h1><pre class="source lang-java linenums">package game;
+
+import processing.core.PFont;
+import java.util.*;
+import java.io.*;
+
+/**
+* General game manager class which stores all the states and attributes about the game session and
+* directs all functions of the game.
+*/
+public class Game {
+    // Constant Variables
+    /**
+    * The size of each cell within the gridspace.
+    */
+    public static final int GRIDSPACE = 16; // Size of each grid space
+    /**
+    * The offset value for Waka's drawing position.
+    */
+    public static final int WAKAOFFSET = 4; // Offset when drawing Waka's sprite
+    /** 
+    * The offset value for ghost drawing positions.
+    */
+    public static final int GHOSTOFFSET = 5; // Offset when drawing the ghost sprite
+    /** 
+    * The App object to be stored within game.
+    */
+    public App app;
+
+
+    // Game Attributes (parsed from file)
+    /**
+    * The name of the map file.
+    */
+    public String mapfile;
+    /**
+    * The number of lives Waka has.
+    */
+    public int lives;
+    /**
+    * The speed that Waka and the ghosts move at.
+    */
+    public int speed;
+    /**
+    * The number of seconds that frightened mode lasts for. 
+    */
+    public int frightenedLength;
+    /**
+    * The number of seconds that invisible mode lasts for.
+    */
+    public int invisibleLength;
+    /**
+    * A list of numbers specifying the number of seconds each scatter and chase mode lasts. 
+    * (starts at scatter)
+    */
+    public int[] modeLengths;
+    /**
+    * An index pointing to the current number to be used within modeLengths. 
+    */
+    public int modeIndex; // Index used to traverse through modeLengths
+
+
+    // Object Containers
+    /**
+    * The PFont object for the text font of the end screens.
+    */
+    public PFont font;
+    /**
+    * The Waka object. 
+    */
+    public Waka waka;
+    /**
+    * A list storing all the individual ghost objects in the game.
+    */
+    public ArrayList&lt;Ghost&gt; ghostList;
+    /**
+    * A list storing all the consumable objects in the game.
+    */
+    public ArrayList&lt;Consumable&gt; consumableList;
+    /**
+    * A list storing all the wall objects in the game.
+    */
+    public ArrayList&lt;Wall&gt; wallList;
+
+
+    // Miscellaneous
+    /**
+    * A timer used to animate Waka's mouth.
+    */
+    public int timerWaka;
+    /**
+    * A timer used to count the number of seconds of each ghost mode.
+    */
+    public int timerMode;
+    /**
+    * A timer saving the difference in time until the next ghost mode to help pause the current 
+    * mode during a special mode.
+    */
+    public int timerModeDifference;
+    /**
+    * A timer used to count the number of seconds for each special mode.
+    */
+    public int timerSpecial;
+    /**
+    * A timer to count the number of seconds after the game ends until it is reset.
+    */
+    public int timerEnd;
+
+    
+    /**
+    * Stores the state of the game as an integer.
+    * &lt;br&gt;
+    * (0 = in-progress, 1 = victory, 2 = defeat)
+    */
+    public int state; // State of the game: 0 = in-progress, 1 = victory, 2 = defeat
+    /**
+    * Key which stores the direction of the most recent keyboard move command.
+    * &lt;br&gt;
+    * (left = 37, up = 38, right = 39, down = 40)
+    */
+    public int moveKey; // Left - 37, Up - 38, Right - 39, Down - 40
+    /**
+    * Key which stores the most recent keyboard key to be compared with the debug mode's key.
+    * &lt;br&gt;
+    * (space-bar = 32) 
+    */
+    public int commandKey; // Space = 32
+    /**
+    * Boolean for whether the debug mode is currently active. 
+    */
+    public boolean debugMode; // Whether debug mode is active
+    /**
+    * String of the ghost mode currently in progress.
+    * &lt;br&gt;
+    * (scatter, chaser, frightened, invisible)
+    */
+    public String mode; // &quot;scatter&quot;, &quot;frightened&quot;, &quot;invisible&quot; or &quot;chase&quot; modes
+    /**
+    * String saving the previous standard ghost mode to revert back to from a special ghost mode.
+    */
+    public String previousMode; // The previous mode, used to revert back from specia;
+
+    // ____________________________________________________________________________________________
+
+    /**
+    * Constructor that parses and initialises all game data.
+    * @param app The App object
+    * @param filename The name of the configuration file
+    */
+<span class="fc" id="L150">    public Game(App app, String filename) {</span>
+<span class="fc" id="L151">        this.app = app;</span>
+        // Parse the json, map and font files
+<span class="fc" id="L153">        Map.parseData(this, filename);</span>
+<span class="fc" id="L154">        Map.parseObject(app, this);</span>
+
+        // Initialise game parameters
+<span class="fc" id="L157">        this.state = 0; </span>
+<span class="fc" id="L158">        this.moveKey = 37; // Movement starts to the left</span>
+<span class="fc" id="L159">        this.debugMode = false;</span>
+<span class="fc" id="L160">        this.mode = &quot;scatter&quot;;</span>
+<span class="fc" id="L161">        this.previousMode = &quot;scatter&quot;;</span>
+
+        // Setting the Timers
+<span class="fc" id="L164">        this.timerWaka = app.millis();</span>
+<span class="fc" id="L165">        this.timerMode = app.millis();</span>
+<span class="fc" id="L166">        this.timerModeDifference = 0;</span>
+<span class="fc" id="L167">        this.timerSpecial = app.millis();</span>
+<span class="fc" id="L168">        this.timerEnd = app.millis();</span>
+<span class="fc" id="L169">    }</span>
+
+    /**
+    * An overloaded constructor for testing purposes so game attributes can be individually
+    * instantiated.
+    * @param overloaded Any string (to simply signify that the overloaded constructor is to be used)
+    */
+<span class="fc" id="L176">    public Game(String overloaded) {} // OVERLOADED Constructor for testing purposes</span>
+
+    // ____________________________________________________________________________________________
+
+    /**
+    * Conduct all game functionalities and update all game attributes.
+    * @param app The App object
+    */
+    public void tick(App app) {
+<span class="fc" id="L185">        this.checkEnd(app); // Check if the game has been completed</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">        if (this.state != 0) { // If the game has ended suspend game</span>
+<span class="fc" id="L187">            return;</span>
+        }
+
+<span class="fc" id="L190">        this.manageTimers(app); // Manage timers </span>
+        // Tick Waka and ghost characteristics
+        // Collision and targeting are conducted within these tick() methods
+<span class="fc" id="L193">        this.waka.tick(app, this);</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        for (Ghost g : this.ghostList) {</span>
+<span class="fc" id="L195">            g.tick(app, this);</span>
+<span class="fc" id="L196">        }</span>
+
+        // Toggle debug mode
+<span class="fc bfc" id="L199" title="All 2 branches covered.">        if (this.commandKey == 32) { // Space bar keypress</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">            if (this.debugMode == true) {</span>
+<span class="fc" id="L201">                this.debugMode = false;</span>
+<span class="fc" id="L202">                this.commandKey = 0; // Reset Key</span>
+            } else {
+<span class="fc" id="L204">                this.debugMode = true;</span>
+<span class="fc" id="L205">                this.commandKey = 0; // Reset Key</span>
+            }
+        }   
+<span class="fc" id="L208">    }</span>
+
+    /**
+    * Draw all the elements of the game to the screen.
+    * @param app The App object
+    */
+    public void draw(App app) {
+        // Draw all objects (walls, fruit, Waka and all ghosts)
+<span class="fc" id="L216">        Map.draw(app, this);</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">        for (Consumable c : this.consumableList) {</span>
+<span class="fc" id="L218">            c.draw(app);</span>
+<span class="fc" id="L219">        }</span>
+<span class="fc" id="L220">        this.waka.draw(app, this);</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">        for (Ghost g : this.ghostList) {</span>
+<span class="fc" id="L222">            g.draw(app, this);</span>
+<span class="fc" id="L223">        }</span>
+
+<span class="fc" id="L225">        this.drawLives(app); // Draw the number of Wakas at the bottom on the screen as lives</span>
+<span class="fc" id="L226">        this.displayEnd(app); // Draw the ending screen</span>
+<span class="fc" id="L227">    }</span>
+
+    // ____________________________________________________________________________________________
+
+    /**
+    * Check if the game has ended by fruit collection, loss of lives or all ghosts dead.
+    * &lt;br&gt;
+    * If so start the timer counting the number of seconds until the game is to be reset.
+    * @param app The app object
+    */
+    public void checkEnd(App app) {
+        // Eating all the fruits
+<span class="fc bfc" id="L239" title="All 4 branches covered.">        if (this.consumableList.size() == 0 &amp;&amp; this.state == 0) {</span>
+<span class="fc" id="L240">            this.state = 1;</span>
+<span class="fc" id="L241">            this.timerEnd = app.millis();</span>
+        }
+        // Losing all Waka's lives
+<span class="fc bfc" id="L244" title="All 4 branches covered.">        else if (this.lives == 0 &amp;&amp; this.state == 0) {</span>
+<span class="fc" id="L245">            this.state = 2;</span>
+<span class="fc" id="L246">            this.timerEnd = app.millis();</span>
+        }
+        // Eating all the ghosts
+<span class="fc" id="L249">        boolean allDead = true;</span>
+<span class="fc bfc" id="L250" title="All 2 branches covered.">        for (Ghost g : this.ghostList) {</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">            if (g.alive == true) {</span>
+<span class="fc" id="L252">                allDead = false;</span>
+<span class="fc" id="L253">                break;</span>
+            }
+<span class="fc" id="L255">        }</span>
+<span class="fc bfc" id="L256" title="All 4 branches covered.">        if (allDead == true &amp;&amp; this.state == 0) {</span>
+<span class="fc" id="L257">            this.state = 1;</span>
+<span class="fc" id="L258">            this.timerEnd = app.millis();</span>
+        }
+        // If the game has ended and 10 seconds has passed, restart the game entirely
+<span class="fc bfc" id="L261" title="All 4 branches covered.">        if (this.state != 0 &amp;&amp; app.millis() &gt; this.timerEnd + 10000) {</span>
+<span class="fc" id="L262">            app.game = new Game(app, &quot;config.json&quot;);</span>
+<span class="fc" id="L263">            return;            </span>
+        }
+<span class="fc" id="L265">    }</span>
+
+    /**
+    * Display the ending screen including text.
+    * @param app The App object
+    */
+    public void displayEnd(App app) {
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">        if (this.state == 1) {</span>
+<span class="nc" id="L273">            app.background(0, 0, 0); // Black background</span>
+<span class="nc" id="L274">            app.textFont(this.font); // Setting text font</span>
+<span class="nc" id="L275">            app.text(&quot;YOU WIN&quot;, 130, 240);</span>
+<span class="pc bpc" id="L276" title="1 of 2 branches missed.">        } else if (this.state == 2) {</span>
+<span class="nc" id="L277">            app.background(0, 0, 0); // Black background</span>
+<span class="nc" id="L278">            app.textFont(this.font); // Setting text font</span>
+<span class="nc" id="L279">            app.text(&quot;GAME OVER&quot;, 120, 240);</span>
+        }
+<span class="fc" id="L281">    } </span>
+
+    /**
+    * Manage all timers within the game for modes and animations.
+    * @param app The App object
+    */
+    public void manageTimers(App app) {
+        // Timer for Waka's Mouth (8 frames, 133 milliseconds)
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        if (app.millis() &gt; this.timerWaka + 133) {</span>
+<span class="fc" id="L290">            this.waka.changeSprite();</span>
+<span class="fc" id="L291">            this.timerWaka = app.millis();</span>
+        }
+        // Timer for Mode (modeLengths seconds)
+<span class="fc bfc" id="L294" title="All 2 branches covered.">        if (app.millis() &gt; this.timerMode + 1000 * this.modeLengths[modeIndex]) {</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">            if (this.mode.equals(&quot;scatter&quot;)) {</span>
+<span class="fc" id="L296">                this.mode = &quot;chase&quot;;</span>
+            } else {
+<span class="fc" id="L298">                this.mode = &quot;scatter&quot;;</span>
+            }
+<span class="fc" id="L300">            this.modeIndex += 1;</span>
+<span class="fc bfc" id="L301" title="All 2 branches covered.">            if (this.modeIndex &gt;= this.modeLengths.length) { // Start from the beginning if reach the end</span>
+<span class="fc" id="L302">                this.modeIndex = 0;</span>
+<span class="fc" id="L303">                this.mode = &quot;scatter&quot;;</span>
+            }
+<span class="fc" id="L305">            this.previousMode = this.mode;</span>
+<span class="fc" id="L306">            this.timerMode = app.millis();</span>
+        }
+        // Timer for Special mode
+<span class="fc bfc" id="L309" title="All 4 branches covered.">        if (!(this.mode.equals(&quot;scatter&quot;) || this.mode.equals(&quot;chase&quot;))) {</span>
+            // Once the timer has been reached, revert to previous mode and ghost sprites
+<span class="fc" id="L311">            int timeLength = 0;</span>
+<span class="fc bfc" id="L312" title="All 2 branches covered.">            if (this.mode.equals(&quot;frightened&quot;)) {</span>
+<span class="fc" id="L313">                timeLength = this.frightenedLength;</span>
+<span class="fc bfc" id="L314" title="All 2 branches covered.">            } else if (this.mode.equals(&quot;invisible&quot;)) {</span>
+<span class="fc" id="L315">                timeLength = this.invisibleLength;</span>
+            } else {
+<span class="fc" id="L317">                return;</span>
+            }
+            // While in special mode, standard mode changing is suspended
+<span class="fc" id="L320">            this.timerMode = app.millis() - this.timerModeDifference;</span>
+<span class="pc bpc" id="L321" title="1 of 2 branches missed.">            if (app.millis() &gt; this.timerSpecial + 1000 * timeLength) {</span>
+<span class="fc" id="L322">                this.mode = this.previousMode; // Revert to previous mode</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">                for (Ghost g : this.ghostList) {</span>
+<span class="fc" id="L324">                    g.ghostMode = 0; // Revert to standard ghost mode</span>
+<span class="fc" id="L325">                    g.changeSprite();</span>
+<span class="fc" id="L326">                }</span>
+            }
+        }        
+<span class="fc" id="L329">    }</span>
+
+    // Lives counter
+    /**
+    * Draw the number of lives remaining as right-facing Waka sprites at the bottom of the screen.
+    * @param app The App object
+    */
+    public void drawLives(App app) {
+<span class="fc bfc" id="L337" title="All 2 branches covered.">        for (int i = 0; i &lt; this.lives; i++) {</span>
+            // NOTE: The screen width can only accomodate 17 Waka sprites across the width of the grid
+<span class="fc" id="L339">            app.image(this.waka.playerRight, 6 + i * (this.GRIDSPACE + 10), app.HEIGHT - 2 * this.GRIDSPACE);</span>
+        }
+<span class="fc" id="L341">    }  </span>
+
+    // Change special modes (frightened, invisible)
+    /**
+    * Change the current ghost mode to the specified special mode.
+    * @param app The App object
+    * @param specialMode A string specifying the name of the special mode to be changed to
+    * (frightened, invisible)
+    */
+    public void specialMode(App app, String specialMode) {
+        // If a special object is collected while their mode is active, don't overwrite previous mode
+<span class="fc bfc" id="L352" title="All 4 branches covered.">        if (this.mode.equals(&quot;scatter&quot;) || this.mode.equals(&quot;chase&quot;)) {</span>
+<span class="fc" id="L353">            this.previousMode = this.mode; // Saves the current mode so it can correctly revert back</span>
+        }
+<span class="fc" id="L355">        this.timerSpecial = app.millis();</span>
+        // Saves the time until next periodic mode 
+<span class="fc" id="L357">        this.timerModeDifference = app.millis() - this.timerMode;</span>
+<span class="fc" id="L358">        int ghostMode = 0; </span>
+<span class="fc bfc" id="L359" title="All 2 branches covered.">        if (specialMode.equals(&quot;frightened&quot;)) { // FRIGHTENED MODE</span>
+<span class="fc" id="L360">            this.mode = &quot;frightened&quot;;</span>
+<span class="fc" id="L361">            ghostMode = 1; </span>
+<span class="fc bfc" id="L362" title="All 2 branches covered.">        } else if (specialMode.equals(&quot;invisible&quot;)) { // INVISIBLE MODE</span>
+<span class="fc" id="L363">            this.mode = &quot;invisible&quot;;</span>
+<span class="fc" id="L364">            ghostMode = 2;</span>
+        }
+<span class="fc bfc" id="L366" title="All 2 branches covered.">        for (Ghost g : this.ghostList) { // Change all ghost sprites</span>
+<span class="fc" id="L367">            g.ghostMode = ghostMode;</span>
+<span class="fc" id="L368">            g.changeSprite();</span>
+<span class="fc" id="L369">        }</span>
+<span class="fc" id="L370">    }</span>
+
+    /**
+    * Reset Waka position, all ghost positions and the current mode to what they were at the start of the game.
+    */
+    // After collision with ghost, reset positions
+    public void resetSpawn() {
+<span class="fc" id="L377">        this.waka.reset();</span>
+<span class="fc bfc" id="L378" title="All 2 branches covered.">        for (Ghost g : this.ghostList) {</span>
+<span class="fc" id="L379">            g.reset();</span>
+<span class="fc" id="L380">            g.xVelocity = -this.speed;</span>
+<span class="fc" id="L381">        }</span>
+<span class="fc" id="L382">        this.moveKey = 37;</span>
+
+        // Reset mode progress of the game to the beginning
+<span class="fc" id="L385">        this.mode = &quot;scatter&quot;;</span>
+<span class="fc" id="L386">        this.previousMode = &quot;scatter&quot;;</span>
+<span class="fc" id="L387">        this.modeIndex = 0;</span>
+<span class="fc" id="L388">        this.timerMode = this.app.millis();</span>
+<span class="fc" id="L389">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

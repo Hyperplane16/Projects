@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="game.IgnorantTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2020-11-22T10:29:08" hostname="LAPTOP-VROLHKP5" time="0.245">
+  <properties/>
+  <testcase name="unknownModeTest()" classname="game.IgnorantTest" time="0.073"/>
+  <testcase name="chaseModeTest()" classname="game.IgnorantTest" time="0.088"/>
+  <testcase name="scatterModeTest()" classname="game.IgnorantTest" time="0.079"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

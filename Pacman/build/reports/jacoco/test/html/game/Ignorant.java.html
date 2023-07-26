@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Ignorant.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Waka</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">Ignorant.java</span></div><h1>Ignorant.java</h1><pre class="source lang-java linenums">package game;
+
+import processing.core.PImage;
+import java.lang.Math;
+import java.util.*;
+
+/**
+* The Ignorant ghost type.
+*/
+public class Ignorant extends Ghost {
+    /**
+    * Instantiates the ghost.
+    * @param x The x coordinate
+    * @param y The y coordinate
+    * @param sprite The object's sprite
+    */
+    public Ignorant(int x, int y, PImage sprite) {
+<span class="fc" id="L18">        super(x, y, sprite);</span>
+<span class="fc" id="L19">    }</span>
+
+    @Override
+    public ArrayList&lt;Integer&gt; target(Game game) {
+<span class="fc" id="L23">        int xDifference = 0;</span>
+<span class="fc" id="L24">        int yDifference = 0;</span>
+
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (game.mode.equals(&quot;chase&quot;)) {</span>
+            // Target - Waka's Position 
+<span class="fc" id="L28">            xDifference = (game.waka.getCx(game.WAKAOFFSET) - this.getCx(game.GHOSTOFFSET));</span>
+<span class="fc" id="L29">            yDifference = (game.waka.getCy(game.WAKAOFFSET) - this.getCy(game.GHOSTOFFSET));</span>
+        }
+        // If scatter mode or less than 8 euclidean cells away, target is buttom left corner
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (game.mode.equals(&quot;scatter&quot;) ||</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">            Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2))/game.GRIDSPACE &lt; 8) {</span>
+            // Target - Bottom left corner
+<span class="fc" id="L35">            xDifference = (0 - this.getCx(game.GHOSTOFFSET));</span>
+<span class="fc" id="L36">            yDifference = (35*game.GRIDSPACE - this.getCy(game.GHOSTOFFSET));</span>
+        }
+
+<span class="fc" id="L39">        ArrayList&lt;Integer&gt; lengthDifferences = new ArrayList&lt;Integer&gt;(Arrays.asList(xDifference, yDifference));</span>
+<span class="fc" id="L40">        return lengthDifferences;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

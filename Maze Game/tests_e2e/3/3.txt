@@ -1,0 +1,1 @@
+Player attemping to leave through a hole in the outer perimeter repeatedly should be blocked and act as stepping into a wall

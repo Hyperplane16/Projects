@@ -1,0 +1,9 @@
+allocated 1
+allocated 1
+allocated 2
+allocated 4
+allocated 1
+free 1
+free 2
+free 4
+free 16

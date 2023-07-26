@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Whim.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Waka</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">Whim.java</span></div><h1>Whim.java</h1><pre class="source lang-java linenums">package game;
+
+import processing.core.PImage;
+import java.lang.Math;
+import java.util.*;
+
+/**
+* The Whim ghost type.
+*/
+public class Whim extends Ghost {
+    /**
+    * Instantiates the ghost.
+    * @param x The x coordinate
+    * @param y The y coordinate
+    * @param sprite The object's sprite
+    */
+    public Whim(int x, int y, PImage sprite) {
+<span class="fc" id="L18">        super(x, y, sprite);</span>
+<span class="fc" id="L19">    }</span>
+
+    @Override
+    public ArrayList&lt;Integer&gt; target(Game game) {
+<span class="fc" id="L23">        int xDifference = 0;</span>
+<span class="fc" id="L24">        int yDifference = 0;</span>
+
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (game.mode.equals(&quot;chase&quot;)) {</span>
+            // Target - Consider the vector from any single Chaser to 2 cells ahead of Waka in the 
+            // direction of his movement and double it. Then consider from the position of Whim
+            // If all Chasers are dead, target Waka's position instead.
+<span class="fc" id="L30">            xDifference = (game.waka.getCx(game.WAKAOFFSET) - this.getCx(game.GHOSTOFFSET));</span>
+<span class="fc" id="L31">            yDifference = (game.waka.getCy(game.WAKAOFFSET) - this.getCy(game.GHOSTOFFSET));</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">            for (Ghost g : game.ghostList) {</span>
+<span class="fc bfc" id="L33" title="All 4 branches covered.">                if (g instanceof Chaser &amp;&amp; g.alive == true) {</span>
+                    // Consider the difference between current Chaser position and 2 cells ahead of Waka, then multiply by 2
+<span class="fc" id="L35">                    int xChaserDifference = 2 * (game.waka.getCx(game.WAKAOFFSET) + </span>
+<span class="fc" id="L36">                        2 * game.GRIDSPACE * Integer.signum(game.waka.xVelocity) - g.getCx(game.GHOSTOFFSET));</span>
+<span class="fc" id="L37">                    int yChaserDifference = 2 * (game.waka.getCy(game.WAKAOFFSET) + </span>
+<span class="fc" id="L38">                        2 * game.GRIDSPACE * Integer.signum(game.waka.yVelocity) - g.getCy(game.GHOSTOFFSET));</span>
+                    // Using the chaser's position to consider the target in relation to Whim
+<span class="fc" id="L40">                    xDifference = (g.getCx(game.GHOSTOFFSET) + xChaserDifference - this.getCx(game.GHOSTOFFSET));</span>
+<span class="fc" id="L41">                    yDifference = (g.getCy(game.GHOSTOFFSET) + yChaserDifference - this.getCy(game.GHOSTOFFSET));</span>
+<span class="fc" id="L42">                    break;</span>
+                }
+<span class="fc" id="L44">            }</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        } else if (game.mode.equals(&quot;scatter&quot;)) {</span>
+            // Target - Bottom right corner
+<span class="fc" id="L47">            xDifference = (27*game.GRIDSPACE - this.getCx(game.GHOSTOFFSET));</span>
+<span class="fc" id="L48">            yDifference = (35*game.GRIDSPACE - this.getCy(game.GHOSTOFFSET));</span>
+        }
+
+<span class="fc" id="L51">        ArrayList&lt;Integer&gt; lengthDifferences = new ArrayList&lt;Integer&gt;(Arrays.asList(xDifference, yDifference));</span>
+<span class="fc" id="L52">        return lengthDifferences;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameObject.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Waka</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">GameObject.java</span></div><h1>GameObject.java</h1><pre class="source lang-java linenums">package game;
+
+import processing.core.PImage;
+
+/**
+* General purpose object superclass of all objects in the game.
+*/
+public abstract class GameObject {
+    /**
+    * The x coordinate of the object.
+    */
+    public int x;
+    /**
+    * The y coordinate of the object.
+    */
+    public int y;
+    /**
+    * The PImage sprite of the object.
+    */
+    public PImage sprite;
+    /**
+    * The initial x coordinate of the object at instantiation.
+    */
+    public int xSpawn;
+    /**
+    * The initial y coordinate of the object at instantiation. 
+    */
+    public int ySpawn;
+
+    /**
+    * General superclass constructor which is called by all game objects to instantiate its most basic
+    * attributes.
+    * @param x The x coordinate
+    * @param y The y coordinate
+    * @param sprite The sprite object
+    */
+<span class="fc" id="L37">    public GameObject(int x, int y, PImage sprite) {</span>
+<span class="fc" id="L38">        this.x = x;</span>
+<span class="fc" id="L39">        this.y = y;</span>
+<span class="fc" id="L40">        this.sprite = sprite;</span>
+
+<span class="fc" id="L42">        this.xSpawn = this.x;</span>
+<span class="fc" id="L43">        this.ySpawn = this.y;</span>
+<span class="fc" id="L44">    }</span>
+
+    /**
+    * Draw the object using its sprite.
+    * @param app The App object
+    */
+    public void draw(App app) {
+<span class="fc" id="L51">        app.image(this.sprite, this.x, this.y);</span>
+<span class="fc" id="L52">    }</span>
+
+    // Getter methods to retrieve the coordinates of the cell the object is currently occupying.
+    // For Waka and Ghosts their models are offset, so it needs to be re-added to compare to the cell coordinate
+    // Where cells are 16x16 pixels.
+    /**
+    * Finds the x coordinate of the closest 16x16 cell by rounding down the current x position to the nearest 
+    * multiple of 16.
+    * @param offset The offset value of the object to when drawing the sprite (applies to ghost and Waka)
+    * @return The x coordinate of the closest cell
+    */
+    public int getCx(int offset) {
+        // Round the current position to the nearest top left corner.
+        // double cell = (this.x + offset)/16;
+        // int x = (int)cell * 16; // x of current cell by rounding down the decimal
+<span class="fc" id="L67">        int x = (this.x + offset)/16 * 16;</span>
+<span class="fc" id="L68">        return x;</span>
+    } 
+
+    /**
+    * Finds the y coordinate of the closest 16x16 cell by rounding down the current y position to the nearest 
+    * multiple of 16.
+    * @param offset The offset value of the object to when drawing the sprite (applies to ghost and Waka)
+    * @return The y coordinate of the closest cell
+    */
+    public int getCy(int offset) {
+        // Round the current position to the nearest top left corner.
+        // double cell = (this.y + offset)/16;
+        // int y = (int)cell * 16; // y of current cell by rounding down the decimal
+<span class="fc" id="L81">        int y = (this.y + offset)/16 * 16;</span>
+<span class="fc" id="L82">        return y;</span>
+    }
+
+    // Method to determine whether any given object is in the centre of a cell, given a possible offset
+    /**
+    * Determines whether the given object is in the centre of a 16x16 cell.
+    * @param offset The offset value of the object to when drawing the sprite (applies to ghost and Waka)
+    * @return Whether the cell is at the centre or not
+    */
+    public boolean isCentre(int offset) {
+<span class="fc bfc" id="L92" title="All 4 branches covered.">        if (this.x + offset != this.getCx(offset) || this.y + offset != this.getCy(offset)) {</span>
+<span class="fc" id="L93">            return false;</span>
+        }
+<span class="fc" id="L95">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

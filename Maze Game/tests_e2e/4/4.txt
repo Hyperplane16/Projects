@@ -1,0 +1,1 @@
+Should be able to use teleport pads correctly, including the use of the "E" key if necessary

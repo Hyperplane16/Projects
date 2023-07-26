@@ -1,0 +1,1 @@
+Standard game loss - fire needs to cause the game to be lost if no water buckets are picked up
